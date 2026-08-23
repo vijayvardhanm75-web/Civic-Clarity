@@ -1,0 +1,6 @@
+{
+  "name": "CivicClarity",
+  "description": "AI tool that translates dense government and legal documents into plain language with urgency badges, action items, deadlines, and Indian language translation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
