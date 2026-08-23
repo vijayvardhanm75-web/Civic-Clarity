@@ -78,4 +78,4 @@ The app runs at `http://localhost:3000`.
 
 ---
 
-*Built for [Hackathon Name] — Track: AI for Digital Public Infrastructure & Governance*
+*Built for Hack 2 Skill — Track: AI for Digital Public Infrastructure & Governance*
