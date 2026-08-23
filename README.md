@@ -1,4 +1,81 @@
 <div align="center"> <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" /> </div> 
-# CivicClarity AI tool that translates dense government and legal documents into plain language, with urgency ratings, deadlines, glossary, and Hindi/Kannada translation. ## Run Locally **Prerequisites:** Node.js 1. Install dependencies: `npm install` 
-2. Set the `GROQ_API_KEY` in a `.env` file (get a free key at console.groq.com) 
-3. Run the app: `npm run dev`
+# 🏛️ CivicClarity
+
+**AI-powered plain-language translator for government and legal documents**
+
+CivicClarity turns dense circulars, tax notices, legal summons, and government memos into clear, actionable, plain-English breakdowns — accessible to any citizen, in any language, from any document format.
+
+---
+
+## The Problem
+
+Government and legal notices are often written in dense bureaucratic language that ordinary citizens struggle to understand. Missed deadlines, misunderstood penalties, and ignored notices are common consequences — not because people don't care, but because the documents aren't written for them.
+
+## The Solution
+
+Upload a document — as pasted text, a typed PDF, a scanned PDF, or even a photo taken on a phone — and CivicClarity instantly returns:
+
+- 🚦 **Urgency rating** — Action Required Now / Action Needed Soon / Informational Only
+- 📝 **Plain-language summary** — 9th-grade reading level, no jargon
+- 💡 **"What this means for you"** — the real-world impact, explained simply
+- ✅ **Action checklist** — specific, concrete steps to take
+- 📅 **Deadlines** — extracted and sorted, soonest first
+- 📖 **Glossary** — jargon terms explained in plain language
+- 🌐 **Hindi & Kannada translation** — one click to translate the full breakdown
+- 🔊 **Read-aloud** — accessibility for low-literacy users
+
+## Why It Matters
+
+Built for the **AI for Digital Public Infrastructure & Governance** track — this isn't just a summarizer, it's a **triage and comprehension tool** designed to help ordinary citizens actually act on the government communications that affect them.
+
+---
+
+## Screenshots
+
+*(Add 2-3 screenshots here: the upload screen, a result with a red urgency badge, and the Hindi/Kannada translation view)*
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React + Vite + Tailwind CSS |
+| Backend | Node.js + Express |
+| AI | Groq (Llama / Qwen models) |
+| Document Processing | `pdf-parse` (typed PDFs), `unpdf` + `@napi-rs/canvas` (scanned PDFs → image), vision model (photos) |
+
+## How It Works
+
+1. **Text or typed PDF** → text extracted directly, analyzed by a fast text model
+2. **Photo or scanned PDF** → rendered/read as an image, analyzed by a vision-capable model
+3. Every input path returns the same structured breakdown: urgency, summary, impact, action items, deadlines, glossary
+4. Documents flagged as blurry or unreadable get clear, honest feedback instead of a hallucinated guess
+
+## Run Locally
+
+**Prerequisites:** Node.js 18+
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Add your Groq API key
+echo "GROQ_API_KEY=your_key_here" > .env
+# Get a free key at https://console.groq.com/keys
+
+# 3. Run the app
+npm run dev
+```
+
+The app runs at `http://localhost:3000`.
+
+## Responsible AI Notes
+
+- Never invents deadlines, penalties, or action items not present in the source document
+- Explicitly flags unreadable/unclear uploads instead of guessing at their content
+- Keeps a neutral, factual tone even for urgent or penalty-related notices
+
+---
+
+*Built for [Hackathon Name] — Track: AI for Digital Public Infrastructure & Governance*
