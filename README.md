@@ -36,12 +36,6 @@ Built for the **AI for Digital Public Infrastructure & Governance** track — th
 
 ---
 
-## Screenshots
-
-*(Add 2-3 screenshots here: the upload screen, a result with a red urgency badge, and the Hindi/Kannada translation view)*
-
----
-
 ## Tech Stack
 
 | Layer | Technology |
