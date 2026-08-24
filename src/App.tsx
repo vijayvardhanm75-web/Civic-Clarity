@@ -285,7 +285,7 @@ export default function App() {
         onOpenSamples={() => setIsSamplesOpen(true)}
       />
 
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
+      <main className="mx-auto max-w-3xl px-4 py-6 sm:max-w-4xl sm:px-6 sm:py-8 lg:max-w-6xl lg:px-8 lg:py-10 xl:max-w-7xl">
         {/* Civic Trust Header */}
         <div className="mb-6 text-center">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-serif">
@@ -436,7 +436,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="mt-16 border-t border-slate-200 bg-white py-6">
-        <div className="mx-auto max-w-4xl px-4 text-center text-xs text-slate-500 sm:px-6">
+        <div className="mx-auto max-w-3xl px-4 text-center text-xs text-slate-500 sm:max-w-4xl sm:px-6 lg:max-w-6xl lg:px-8 xl:max-w-7xl">
           <p className="font-medium text-slate-700">CivicClarity — Accessible Civic Transparency</p>
           <p className="mt-1 text-slate-400">
             AI-powered plain language simplification. Always consult official municipal channels or legal counsel for statutory proceedings.
