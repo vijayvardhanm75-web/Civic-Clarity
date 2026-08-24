@@ -1,9 +1,15 @@
-<div align="center"> <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" /> </div> 
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
+
 # 🏛️ CivicClarity
 
 **AI-powered plain-language translator for government and legal documents**
 
 CivicClarity turns dense circulars, tax notices, legal summons, and government memos into clear, actionable, plain-English breakdowns — accessible to any citizen, in any language, from any document format.
+
+🔗 **Live App:** [https://civic-clarity.onrender.com](https://civic-clarity.onrender.com)
+*(Free tier — first request after inactivity may take ~50 seconds to wake up)*
 
 ---
 
@@ -26,7 +32,7 @@ Upload a document — as pasted text, a typed PDF, a scanned PDF, or even a phot
 
 ## Why It Matters
 
-Built for the **AI for Digital Public Infrastructure & Governance** track — this isn't just a summarizer, it's a **triage and comprehension tool** designed to help ordinary citizens actually act on the government communications that affect them.
+Built for the **AI for Digital Public Infrastructure & Governance** track — this isn't just a summarizer, it's a **triage and comprehension tool** designed to help ordinary citizens actually act on the government communications that affect them. It's designed to scale across any Indian state or municipality, not tied to one city's document format or language.
 
 ---
 
@@ -42,13 +48,14 @@ Built for the **AI for Digital Public Infrastructure & Governance** track — th
 |---|---|
 | Frontend | React + Vite + Tailwind CSS |
 | Backend | Node.js + Express |
-| AI | Groq (Llama / Qwen models) |
-| Document Processing | `pdf-parse` (typed PDFs), `unpdf` + `@napi-rs/canvas` (scanned PDFs → image), vision model (photos) |
+| AI | **Google Gemini** (`gemini-3.5-flash`) — text understanding + computer vision for photos/scanned documents |
+| Document Processing | `pdf-parse` (typed PDFs), `unpdf` + `@napi-rs/canvas` (scanned PDFs → image for vision analysis) |
+| Deployment | Render |
 
 ## How It Works
 
-1. **Text or typed PDF** → text extracted directly, analyzed by a fast text model
-2. **Photo or scanned PDF** → rendered/read as an image, analyzed by a vision-capable model
+1. **Text or typed PDF** → text extracted directly, analyzed by Gemini
+2. **Photo or scanned PDF** → rendered/read as an image, analyzed by Gemini's vision capability
 3. Every input path returns the same structured breakdown: urgency, summary, impact, action items, deadlines, glossary
 4. Documents flagged as blurry or unreadable get clear, honest feedback instead of a hallucinated guess
 
@@ -60,9 +67,9 @@ Built for the **AI for Digital Public Infrastructure & Governance** track — th
 # 1. Install dependencies
 npm install
 
-# 2. Add your Groq API key
-echo "GROQ_API_KEY=your_key_here" > .env
-# Get a free key at https://console.groq.com/keys
+# 2. Add your Gemini API key
+echo "GEMINI_API_KEY=your_key_here" > .env
+# Get a free key at https://aistudio.google.com/apikey
 
 # 3. Run the app
 npm run dev
