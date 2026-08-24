@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import Groq from "groq-sdk";
+import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import { createRequire } from "module";
 
@@ -18,24 +18,22 @@ const PORT = 3000;
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// Lazy initialize Groq client
-let groqClient: Groq | null = null;
+// Lazy initialize Gemini client
+let geminiClient: GoogleGenAI | null = null;
 
-function getGroqClient(): Groq {
-  if (!groqClient) {
-    const apiKey = process.env.GROQ_API_KEY;
+function getGeminiClient(): GoogleGenAI {
+  if (!geminiClient) {
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.warn("GROQ_API_KEY is not set in environment.");
+      console.warn("GEMINI_API_KEY is not set in environment.");
     }
-    groqClient = new Groq({ apiKey: apiKey || "" });
+    geminiClient = new GoogleGenAI({ apiKey: apiKey || "" });
   }
-  return groqClient;
+  return geminiClient;
 }
 
-// Vision-capable model (handles images/PDF pages) — used ONLY when a file is uploaded
-const VISION_MODEL = "qwen/qwen3.6-27b";
-// Fast, stable text-only model — used for plain text and translation
-const TEXT_MODEL = "openai/gpt-oss-120b";
+// Current Gemini model — multimodal (handles text AND images)
+const GEMINI_MODEL = "gemini-3.5-flash";
 
 // Helper: extract the first valid JSON object from a raw model response
 function extractJson(rawText: string): any {
@@ -75,7 +73,7 @@ app.post("/api/simplify", async (req, res) => {
       return;
     }
 
-    const groq = getGroqClient();
+    const ai = getGeminiClient();
 
     // If a PDF was uploaded, first try extracting its real text layer
     let extractedPdfText: string | null = null;
@@ -98,7 +96,7 @@ app.post("/api/simplify", async (req, res) => {
         console.error("PDF text extraction error:", pdfErr);
       }
 
-      // No usable text found — this is likely a scanned/image-based PDF. Try rendering it as an image instead.
+      // No usable text found — likely a scanned/image-based PDF. Try rendering it as an image instead.
       if (!extractedPdfText) {
         try {
           pdfRenderedImageBase64 = await renderPdfFirstPageToPngBase64(pdfBuffer);
@@ -131,7 +129,7 @@ app.post("/api/simplify", async (req, res) => {
     // Determine what image data (if any) should go to the vision model:
     // either a real uploaded JPG/PNG, or a PDF page we rendered to an image ourselves
     const isRealImageFile = hasFile && mimeType !== "application/pdf";
-    const useVisionModel = !effectiveHasText && (isRealImageFile || Boolean(pdfRenderedImageBase64));
+    const useVision = !effectiveHasText && (isRealImageFile || Boolean(pdfRenderedImageBase64));
 
     const promptText = `You are CivicClarity, an expert civic assistant dedicated to translating dense government, municipal, and legal documents into clear, neutral, 9th-grade plain language for ordinary citizens.
 
@@ -183,31 +181,31 @@ CRITICAL ANALYSIS RULES:
 
 ${effectiveHasText ? `DOCUMENT TEXT:\n"""\n${effectiveText}\n"""` : `Analyze the uploaded document/image provided.`}`;
 
-    // Build the message content — text-only, or text + image
-    let messageContent: any;
-    if (useVisionModel) {
+    // Build the request contents — text-only, or text + image
+    let contents: any;
+    if (useVision) {
       const imageBase64 = pdfRenderedImageBase64
         ? pdfRenderedImageBase64
         : fileData.includes(";base64,")
         ? fileData.split(";base64,")[1]
         : fileData;
       const imageMimeType = pdfRenderedImageBase64 ? "image/png" : mimeType;
-      messageContent = [
-        { type: "text", text: promptText },
-        { type: "image_url", image_url: { url: `data:${imageMimeType};base64,${imageBase64}` } },
+      contents = [
+        {
+          role: "user",
+          parts: [{ text: promptText }, { inlineData: { mimeType: imageMimeType, data: imageBase64 } }],
+        },
       ];
     } else {
-      messageContent = promptText;
+      contents = promptText;
     }
 
-    const completion = await groq.chat.completions.create({
-      model: useVisionModel ? VISION_MODEL : TEXT_MODEL,
-      messages: [{ role: "user", content: messageContent }],
-      max_tokens: 2048,
-      ...(useVisionModel ? { reasoning_effort: "none" as const } : {}),
+    const response = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents,
     });
 
-    const rawText = completion.choices[0]?.message?.content || "";
+    const rawText = response.text || "";
     console.log("RAW AI RESPONSE:", rawText);
     const parsedData = extractJson(rawText);
 
@@ -326,7 +324,7 @@ app.post("/api/translate", async (req, res) => {
 
     const langName = targetLanguage === "hi" ? "Hindi (हिन्दी)" : "Kannada (ಕನ್ನಡ)";
 
-    const groq = getGroqClient();
+    const ai = getGeminiClient();
     const prompt = `You are an expert civic translator specializing in Indian administrative communication.
 Translate the following simplified government document breakdown into natural, highly readable, 9th-grade level ${langName}.
 
@@ -351,12 +349,12 @@ TRANSLATION GUIDELINES:
 - Avoid overly archaic or excessively complex Sanskritized terms where simple everyday spoken words convey the exact civic meaning clearly.
 - Maintain accurate legal and deadline specifics.`;
 
-    const completion = await groq.chat.completions.create({
-      model: TEXT_MODEL,
-      messages: [{ role: "user", content: prompt }],
+    const response = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: prompt,
     });
 
-    const rawText = completion.choices[0]?.message?.content || "";
+    const rawText = response.text || "";
     const parsed = extractJson(rawText);
 
     res.json({
